@@ -1,0 +1,35 @@
+name: CD2
+on: [push]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Install SSH Key
+      uses: shimataro/ssh-key-action@v2
+      with:
+        key: ${{ secrets.SSH_PRIVATE_KEY }}
+        known_hosts: known_hosts
+        if_key_exists: replace
+
+    - name: Run script and create file
+      run: python3 task.py $SEED > task42.txt
+      env:
+        SEED: ${{ vars.SEED }}
+
+    - name: Login to server and create folder
+      run: ssh -o StrictHostKeyChecking=no $username@$host 'mkdir -p ~/AVK'
+      env:
+        host: ${{ vars.HOST }}
+        username: ${{ vars.USERNAME }}
+
+    - name: Copy file to remote server
+      run: scp -o StrictHostKeyChecking=no \
+          task42.txt \
+          $username@$host:~/AVK/task41.txt
+      env:
+        host: ${{ vars.HOST }}
+        username: ${{ vars.USERNAME }}
