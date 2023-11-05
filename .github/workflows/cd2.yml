@@ -27,9 +27,7 @@ jobs:
         username: ${{ vars.USERNAME }}
 
     - name: Copy file to remote server
-      run: scp -o StrictHostKeyChecking=no \
-          task42.txt \
-          $username@$host:~/AVK/task41.txt
+      run: scp -i .ssh/id_rsa task42.txt $username@$host:~/AVK/task41.txt
       env:
         host: ${{ vars.HOST }}
         username: ${{ vars.USERNAME }}
